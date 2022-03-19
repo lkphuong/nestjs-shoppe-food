@@ -8,10 +8,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductDto } from './dto/product.dto';
 import { formatResponse } from 'src/common/utils/response/response';
+import { storage } from 'src/config/storage/storage';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductController {
@@ -39,8 +43,13 @@ export class ProductController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('image', storage))
   @HttpCode(201)
-  async create(@Body() productDto: ProductDto) {
+  async create(
+    @UploadedFile() image: Express.Multer.File,
+    @Body() productDto: ProductDto,
+  ) {
+    productDto.image = image.path;
     const data = await this.productService.create(productDto);
     return formatResponse(data, 0, '', []);
   }

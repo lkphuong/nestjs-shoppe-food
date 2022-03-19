@@ -10,30 +10,31 @@ import {
   Put,
 } from '@nestjs/common';
 import { formatResponse } from 'src/common/utils/response/response';
-import { ShopDto } from './dto/shop.dto';
-import { ShopService } from './shop.service';
+import { MenuDto } from './dto/menu.dto';
+import { MenuService } from './menu.service';
 
-@Controller('shop')
-export class ShopController {
-  constructor(private shopService: ShopService) {}
+@Controller('menu')
+export class MenuController {
+  constructor(private menuService: MenuService) {}
+
   @Get()
   @HttpCode(200)
   async getAll() {
-    const data = await this.shopService.getAll();
+    const data = await this.menuService.getAll();
     return formatResponse(data, 0, '', []);
   }
 
   @Get('/getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
-    const data = await this.shopService.getbyId(id);
+    const data = await this.menuService.getById(id);
     return formatResponse(data, 0, '', []);
   }
 
   @Post()
   @HttpCode(201)
-  async create(@Body() shopDto: ShopDto) {
-    const data = await this.shopService.create(shopDto);
+  async create(@Body() menuDto: MenuDto) {
+    const data = await this.menuService.create(menuDto);
     return formatResponse(data, 0, '', []);
   }
 
@@ -41,17 +42,17 @@ export class ShopController {
   @HttpCode(409)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() shopDto: ShopDto,
+    @Body() menuDto: MenuDto,
   ) {
-    await this.shopService.update(id, shopDto);
-    const shop = await this.shopService.getbyId(id);
-    return formatResponse(shop, 0, '', []);
+    await this.menuService.update(id, menuDto);
+    const menu = await this.menuService.getById(id);
+    return formatResponse(menu, 0, 'update success', []);
   }
 
   @Delete('/deleteById/:id')
   @HttpCode(404)
   async delete(@Param('id', ParseIntPipe) id: number) {
-    await this.shopService.remove(id);
-    return formatResponse({}, 0, '', []);
+    await this.menuService.remove(id);
+    return formatResponse({}, 0, 'delete success', []);
   }
 }

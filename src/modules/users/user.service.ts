@@ -6,6 +6,7 @@ import { UserDto } from './dto/user.dto';
 import { bcryptSalt } from 'src/config/bcrypt/bcrypt';
 import * as bcrypt from 'bcrypt';
 import { TokenDto } from './dto/token.dto';
+import { formatUser } from 'src/common/utils/format/userFormated';
 @Injectable()
 export class UserService {
   constructor(
@@ -14,15 +15,20 @@ export class UserService {
   ) {}
 
   async getAll(): Promise<UserEntity[]> {
-    const user = await this.userRepository.find({ take: 20 });
+    const user = await this.userRepository.find({
+      take: 20,
+      relations: ['group'],
+    });
     if (user) {
-      return user;
+      return formatUser(user);
     }
     throw new NotFoundException();
   }
 
   async getById(id: number): Promise<UserEntity> {
-    const user = await this.userRepository.findOne(id);
+    const user = await this.userRepository.findOne(id, {
+      relations: ['group'],
+    });
     if (user) {
       return user;
     }
@@ -30,7 +36,10 @@ export class UserService {
   }
 
   async getByUsername(username: string): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({ username: username });
+    const user = await this.userRepository.findOne(
+      { username: username },
+      { relations: ['group'] },
+    );
     if (user) {
       return user;
     }
@@ -62,13 +71,18 @@ export class UserService {
   async refreshToken(id: number, tokenDto: Partial<TokenDto>) {
     const user = await this.userRepository.findOne(id);
     if (user) {
-      await this.userRepository.update(id, tokenDto);
+      return await this.userRepository.update(id, tokenDto);
     }
     throw new NotFoundException();
   }
 
   async findByRefreshToken(token: string) {
-    const user = await this.userRepository.findOne({ refreshToken: token });
+    const user = await this.userRepository.findOne(
+      {
+        refreshToken: token,
+      },
+      { relations: ['group'] },
+    );
     if (user) {
       return user;
     }

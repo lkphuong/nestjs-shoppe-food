@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { DetailCartEntity } from 'src/modules/detailCarts/entity/detailCart.entity';
 @Entity()
-export class CartEnity {
+export class CartEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()

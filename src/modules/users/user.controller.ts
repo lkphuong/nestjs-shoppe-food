@@ -8,14 +8,23 @@ import {
   Param,
   ParseIntPipe,
   Body,
+  Inject,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { formatResponse } from 'src/common/utils/response/response';
 import { UserDto } from './dto/user.dto';
+import { REQUEST } from '@nestjs/core';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { ROLE } from 'src/common/emuns/role.emun';
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    @Inject(REQUEST) private request: any,
+  ) {}
 
+  @Roles(ROLE.MASTER)
   @Get()
   @HttpCode(200)
   async getAll() {

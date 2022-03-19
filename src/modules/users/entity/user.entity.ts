@@ -1,4 +1,4 @@
-import { CartEnity } from 'src/modules/carts/entity/cart.entity';
+import { CartEntity } from 'src/modules/carts/entity/cart.entity';
 import { OrderEntity } from 'src/modules/orders/entity/order.entity';
 import {
   Entity,
@@ -22,9 +22,9 @@ export class UserEntity {
   refreshToken?: string;
   @ManyToOne(() => GroupEntity, (group) => group.users)
   group: GroupEntity;
-  @OneToOne(() => CartEnity)
+  @OneToOne(() => CartEntity)
   @JoinColumn()
-  cart: CartEnity;
+  cart: CartEntity;
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
 }

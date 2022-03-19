@@ -33,6 +33,6 @@ export class ProductEntity {
   category: CategoryEntity;
   @OneToMany(() => DetailOrderEntity, (detailOrder) => detailOrder.product)
   detailOrder: DetailOrderEntity[];
-  @OneToMany(() => DetailCartEntity, (detailOrder) => detailOrder.product)
+  @OneToMany(() => DetailCartEntity, (detailCart) => detailCart.product)
   detailCart: DetailCartEntity[];
 }

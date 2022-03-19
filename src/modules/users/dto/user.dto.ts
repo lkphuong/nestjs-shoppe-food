@@ -6,4 +6,6 @@ export class UserDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  refreshToken?: string;
 }

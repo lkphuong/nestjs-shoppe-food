@@ -10,8 +10,8 @@ export class ShopEntity {
   @Column()
   address: string;
 
-  @OneToMany(() => MenuEntity, (menu) => menu.products)
+  @OneToMany(() => MenuEntity, (menu) => menu.shop)
   menus: MenuEntity[];
-  @OneToMany(() => ProductEntity, (shop) => shop.shop)
+  @OneToMany(() => ProductEntity, (product) => product.shop)
   products: ProductEntity[];
 }

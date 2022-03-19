@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChangeToSlug } from 'src/common/utils/changeToSlug/changeToSlug';
 import { Repository } from 'typeorm';
 import { ProductDto } from './dto/product.dto';
 import { ProductEntity } from './entity/product.entity';
@@ -14,13 +15,15 @@ export class ProductService {
   async getAll(): Promise<ProductEntity[]> {
     const products = await this.productRepository.find({
       take: 20,
-      relations: ['menu', 'shop', 'category', "'subcategory"],
+      relations: ['menu', 'shop'],
     });
     return products;
   }
 
   async getById(id: number): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne(id);
+    const product = await this.productRepository.findOne(id, {
+      relations: ['menu', 'shop', 'category'],
+    });
     if (product) {
       return product;
     }
@@ -36,7 +39,7 @@ export class ProductService {
   }
 
   async create(productDto: ProductDto) {
-    productDto.slug = productDto.slug.replace(' ', '-');
+    productDto.slug = ChangeToSlug(productDto.name);
     return await this.productRepository.save(productDto);
   }
 
