@@ -7,6 +7,9 @@ import { MenuModule } from './menu/menu.module';
 import { GroupModule } from './groups/group.module';
 import { CategoryModule } from './categories/category.module';
 import { SubcategoryModule } from './subcategories/subcategory.module';
+import { CartModule } from './carts/cart.module';
+import { DetailCartModule } from './detailCarts/detailCart.module';
+import { OrderModule } from './orders/order.module';
 @Module({
   imports: [
     UserModule,
@@ -17,6 +20,9 @@ import { SubcategoryModule } from './subcategories/subcategory.module';
     GroupModule,
     CategoryModule,
     SubcategoryModule,
+    CartModule,
+    DetailCartModule,
+    OrderModule,
   ],
 })
 export class IndexModule {}

@@ -27,8 +27,9 @@ export class UserService {
 
   async getById(id: number): Promise<UserEntity> {
     const user = await this.userRepository.findOne(id, {
-      relations: ['group'],
+      relations: ['group', 'cart'],
     });
+    console.log(user.cart);
     if (user) {
       return user;
     }

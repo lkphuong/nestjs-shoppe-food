@@ -9,6 +9,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { Public } from 'src/auth/setMetadata';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { ROLE } from 'src/common/emuns/role.emun';
 import { formatResponse } from 'src/common/utils/response/response';
 import { MenuDto } from './dto/menu.dto';
 import { MenuService } from './menu.service';
@@ -17,6 +20,7 @@ import { MenuService } from './menu.service';
 export class MenuController {
   constructor(private menuService: MenuService) {}
 
+  @Public()
   @Get()
   @HttpCode(200)
   async getAll() {
@@ -24,6 +28,7 @@ export class MenuController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Public()
   @Get('/getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -31,6 +36,7 @@ export class MenuController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Post()
   @HttpCode(201)
   async create(@Body() menuDto: MenuDto) {
@@ -38,6 +44,7 @@ export class MenuController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Put('/updateById/:id')
   @HttpCode(409)
   async update(
@@ -49,6 +56,7 @@ export class MenuController {
     return formatResponse(menu, 0, 'update success', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Delete('/deleteById/:id')
   @HttpCode(404)
   async delete(@Param('id', ParseIntPipe) id: number) {

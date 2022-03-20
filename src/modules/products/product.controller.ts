@@ -16,11 +16,15 @@ import { ProductDto } from './dto/product.dto';
 import { formatResponse } from 'src/common/utils/response/response';
 import { storage } from 'src/config/storage/storage';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { ROLE } from 'src/common/emuns/role.emun';
+import { Public } from 'src/auth/setMetadata';
 
 @Controller('product')
 export class ProductController {
   constructor(private productService: ProductService) {}
 
+  @Public()
   @Get()
   @HttpCode(200)
   async getAll() {
@@ -28,6 +32,7 @@ export class ProductController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Public()
   @Get('/getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -35,6 +40,7 @@ export class ProductController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Public()
   @Get('getBySlug/:slug')
   @HttpCode(200)
   async getBySlug(@Param('slug') slug: string) {
@@ -42,6 +48,7 @@ export class ProductController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Post()
   @UseInterceptors(FileInterceptor('image', storage))
   @HttpCode(201)
@@ -54,6 +61,7 @@ export class ProductController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Put('/updateById/:id')
   @HttpCode(409)
   async update(
@@ -65,6 +73,7 @@ export class ProductController {
     return formatResponse(data, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Delete('/deleteById/:id')
   @HttpCode(404)
   async delete(@Param('id', ParseIntPipe) id: number) {

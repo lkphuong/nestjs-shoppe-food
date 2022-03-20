@@ -12,10 +12,14 @@ import {
 import { SubcategoryService } from './subcategory.service';
 import { CategoryDto } from '../categories/dto/category.dto';
 import { formatResponse } from 'src/common/utils/response/response';
+import { Public } from 'src/auth/setMetadata';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { ROLE } from 'src/common/emuns/role.emun';
 @Controller('subcategory')
 export class SubcategoryController {
   constructor(private subcategoryService: SubcategoryService) {}
 
+  @Public()
   @Get()
   @HttpCode(200)
   async getAll() {
@@ -23,6 +27,7 @@ export class SubcategoryController {
     return formatResponse(categories, 0, '', []);
   }
 
+  @Public()
   @Get('/getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -30,6 +35,7 @@ export class SubcategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.MASTER)
   @Post()
   @HttpCode(201)
   async create(@Body() categoryDto: CategoryDto) {
@@ -37,6 +43,7 @@ export class SubcategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.MASTER)
   @Put('/updateById/:id')
   @HttpCode(409)
   async update(
@@ -48,6 +55,7 @@ export class SubcategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.MASTER)
   @Delete('deleteById/:id')
   @HttpCode(404)
   async delete(@Param('id', ParseIntPipe) id: number) {
