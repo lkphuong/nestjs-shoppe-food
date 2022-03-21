@@ -16,7 +16,9 @@ export class OrderService {
   }
 
   async getById(id: number): Promise<OrderEntity> {
-    return await this.orderRepository.findOne(id, { relations: ['user'] });
+    return await this.orderRepository.findOne(id, {
+      relations: ['user', 'detailOrders', 'detailOrders.product'],
+    });
   }
 
   async create(orderDto: any) {

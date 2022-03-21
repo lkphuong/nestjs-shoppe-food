@@ -2,11 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DetailCartDto } from './dto/detailCart.dto';
 import { DetailCartEntity } from './entity/detailCart.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { CartService } from '../carts/cart.service';
 import { CartDto } from '../carts/dto/cart.dto';
 import { ProductService } from '../products/product.service';
 import { getConnection } from 'typeorm';
+import { ProductEntity } from '../products/entity/product.entity';
 
 @Injectable()
 export class DetailCartService {
@@ -61,10 +62,9 @@ export class DetailCartService {
   }
 
   async getByIdCart(idCart: number) {
-    return await getConnection()
-      .createQueryBuilder()
-      .select('detail_cart_entity')
-      .from(DetailCartEntity, 'detail_cart_entity')
-      .where('detail_cart_entity.cartId = :cart', { cart: idCart });
+    return await this.detailCartRepository.find({
+      where: { cart: idCart },
+      relations: ['product'],
+    });
   }
 }

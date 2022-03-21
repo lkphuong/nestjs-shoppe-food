@@ -47,7 +47,7 @@ export class UserService {
     throw new NotFoundException();
   }
 
-  async create(userDto: UserDto) {
+  async create(userDto: any) {
     userDto.password = await bcrypt.hash(userDto.password, bcryptSalt.salt);
     userDto.username = userDto.username.replace(/\s/g, '');
     return await this.userRepository.save(userDto);

@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Inject,
   Body,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CartDto } from './dto/cart.dto';
 import { CartService } from './cart.service';
@@ -19,7 +20,10 @@ import { REQUEST } from '@nestjs/core';
 
 @Controller('cart')
 export class CartController {
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    @Inject(REQUEST) private request: any,
+  ) {}
 
   @Roles(ROLE.MASTER)
   @Get()
@@ -33,17 +37,21 @@ export class CartController {
   @Get('getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
-    return await this.cartService.getById(id);
+    const user = await this.request.user;
+    if (user.id === id || ROLE.MASTER) {
+      return await this.cartService.getById(id);
+    }
+    throw new ForbiddenException();
   }
 
-  @Roles()
+  @Roles(ROLE.MASTER)
   @Post()
   @HttpCode(201)
   async create(@Body() cartDto: CartDto) {
     return await this.cartService.create(cartDto);
   }
 
-  @Roles()
+  @Roles(ROLE.MASTER)
   @Put('updateById/:id')
   @HttpCode(409)
   async update(

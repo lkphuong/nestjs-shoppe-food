@@ -11,7 +11,7 @@ export class DetailOrderSerive {
   ) {}
 
   async create(detailOrderDto: any) {
-    await getConnection()
+    return await getConnection()
       .createQueryBuilder()
       .insert()
       .into(DetailOrderEntity)

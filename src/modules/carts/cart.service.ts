@@ -20,7 +20,7 @@ export class CartService {
 
   async getById(id: number): Promise<CartEntity> {
     const cart = await this.cartRepository.findOne(id, {
-      relations: ['detailCarts'],
+      relations: ['detailCarts', 'detailCarts.product'],
     });
     if (cart) {
       return cart;

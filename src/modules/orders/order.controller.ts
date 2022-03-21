@@ -45,7 +45,7 @@ export class OrderController {
   async getById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.request.user;
     const order = await this.orderService.getById(id);
-    if (user.id == order.id) {
+    if (user.id == order.user.id || ROLE.MASTER) {
       return formatResponse(order, 0, '', []);
     }
     throw new ForbiddenException();
@@ -56,16 +56,23 @@ export class OrderController {
   @Post()
   async create(@Body() orderDto: any) {
     const user = await this.request.user;
-    console.log(user);
     const cart = await this.cartService.getById(user.id);
     orderDto = {
       total: cart.total,
       amount: cart.amount,
       user: user.id,
     };
-    const detailCart = await this.detailCartService.getByIdCart(user.id);
-    const detailOrder = await this.detaiOrderService.create(detailCart);
     const order = await this.orderService.create(orderDto);
+    const detailCart = await this.detailCartService.getByIdCart(user.id);
+
+    const cartFormated = detailCart.map((item) => {
+      return {
+        ...item,
+        order: order.id,
+        product: item.product.id,
+      };
+    });
+    const detailOrder = await this.detaiOrderService.create(cartFormated);
     await this.cartService.reset(user.id);
     await this.detailCartService.removeMultipleItem(user.id);
     return formatResponse(order, 0, '', []);
@@ -74,9 +81,11 @@ export class OrderController {
   @Roles(ROLE.MASTER)
   @HttpCode(409)
   @Put('updateById/:id')
-  async update(@Body() orderDto: OrderDto) {
-    const user = await this.request.user;
-    const order = await this.orderService.update(user.id, orderDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() orderDto: OrderDto,
+  ) {
+    const order = await this.orderService.update(id, orderDto);
     return formatResponse(order, 0, '', []);
   }
 
