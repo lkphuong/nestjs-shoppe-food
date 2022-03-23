@@ -32,6 +32,7 @@ export class UserController {
   @Get()
   @HttpCode(200)
   async getAll() {
+    console.log(await this.request.user);
     const data = await this.userService.getAll();
     return formatResponse(data, 0, 'success', []);
   }

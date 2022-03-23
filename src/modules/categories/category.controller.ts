@@ -9,6 +9,9 @@ import {
   ParseIntPipe,
   Body,
 } from '@nestjs/common';
+import { Public } from 'src/auth/setMetadata';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { ROLE } from 'src/common/emuns/role.emun';
 import { formatResponse } from 'src/common/utils/response/response';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
@@ -16,6 +19,7 @@ import { CategoryDto } from './dto/category.dto';
 @Controller('category')
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
+  @Public()
   @Get()
   @HttpCode(200)
   async getAll() {
@@ -23,6 +27,7 @@ export class CategoryController {
     return formatResponse(categories, 0, '', []);
   }
 
+  @Public()
   @Get('/getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -30,6 +35,7 @@ export class CategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Post()
   @HttpCode(201)
   async create(@Body() categoryDto: CategoryDto) {
@@ -37,6 +43,7 @@ export class CategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Put('/updateById/:id')
   @HttpCode(409)
   async update(
@@ -48,6 +55,7 @@ export class CategoryController {
     return formatResponse(category, 0, '', []);
   }
 
+  @Roles(ROLE.ADMIN)
   @Delete('deleteById/:id')
   @HttpCode(404)
   async delete(@Param('id', ParseIntPipe) id: number) {

@@ -11,11 +11,16 @@ export class SubcategoryService {
   ) {}
 
   async getAll() {
-    return await this.subcategoryRepository.find({ take: 20 });
+    return await this.subcategoryRepository.find({
+      take: 20,
+      relations: ['products'],
+    });
   }
 
   async getById(id: number) {
-    const subcategory = await this.subcategoryRepository.findOne(id);
+    const subcategory = await this.subcategoryRepository.findOne(id, {
+      relations: ['products'],
+    });
     if (subcategory) {
       return subcategory;
     }

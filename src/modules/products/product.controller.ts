@@ -56,7 +56,8 @@ export class ProductController {
     @UploadedFile() image: Express.Multer.File,
     @Body() productDto: ProductDto,
   ) {
-    productDto.image = image.path;
+    console.log(image);
+    productDto.image = image.path.slice(7);
     const data = await this.productService.create(productDto);
     return formatResponse(data, 0, '', []);
   }
