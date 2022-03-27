@@ -3,5 +3,5 @@ export class CategoryDto {
   @IsNotEmpty()
   @IsString()
   name: string;
-  description?: string;
+  description: string;
 }

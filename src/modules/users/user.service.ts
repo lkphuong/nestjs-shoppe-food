@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { UserDto } from './dto/user.dto';
-import { bcryptSalt } from 'src/config/bcrypt/bcrypt';
 import * as bcrypt from 'bcrypt';
 import { TokenDto } from './dto/token.dto';
 import { formatUser } from 'src/common/utils/format/userFormated';
@@ -17,7 +16,7 @@ export class UserService {
   async getAll(): Promise<UserEntity[]> {
     const user = await this.userRepository.find({
       take: 20,
-      relations: ['group'],
+      relations: ['group', 'cart'],
     });
     if (user) {
       return formatUser(user);
@@ -29,7 +28,6 @@ export class UserService {
     const user = await this.userRepository.findOne(id, {
       relations: ['group', 'cart'],
     });
-    console.log(user.cart);
     if (user) {
       return user;
     }
@@ -48,7 +46,7 @@ export class UserService {
   }
 
   async create(userDto: any) {
-    userDto.password = await bcrypt.hash(userDto.password, bcryptSalt.salt);
+    userDto.password = await bcrypt.hash(userDto.password, process.env.SALT);
     userDto.username = userDto.username.replace(/\s/g, '');
     return await this.userRepository.save(userDto);
   }

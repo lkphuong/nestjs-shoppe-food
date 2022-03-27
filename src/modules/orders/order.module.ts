@@ -6,12 +6,13 @@ import { DetailCartModule } from '../detailCarts/detailCart.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderEntity } from './entity/order.entity';
 import { DetailOrderModule } from '../detailOrders/detailOrder.module';
-
+import { UserModule } from '../users/user.module';
 @Module({
   imports: [
     CartModule,
     DetailCartModule,
     DetailOrderModule,
+    UserModule,
     TypeOrmModule.forFeature([OrderEntity]),
   ],
   controllers: [OrderController],

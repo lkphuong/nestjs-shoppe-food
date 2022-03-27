@@ -20,6 +20,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { ROLE } from 'src/common/emuns/role.emun';
 import { REQUEST } from '@nestjs/core';
 import { formatResponse } from '../../common/utils/response/response';
+import { UserService } from '../users/user.service';
 
 @Controller('order')
 export class OrderController {
@@ -28,6 +29,7 @@ export class OrderController {
     private cartService: CartService,
     private detailCartService: DetailCartService,
     private detaiOrderService: DetailOrderSerive,
+    private userService: UserService,
     @Inject(REQUEST) private request: any,
   ) {}
 
@@ -45,10 +47,19 @@ export class OrderController {
   async getById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.request.user;
     const order = await this.orderService.getById(id);
-    if (user.id == order.user.id || ROLE.MASTER) {
+    if (user.id == order.user.id || ROLE.MASTER === user.role) {
       return formatResponse(order, 0, '', []);
     }
     throw new ForbiddenException();
+  }
+
+  @Roles(ROLE.USER)
+  @HttpCode(200)
+  @Get('getMyOrders')
+  async getMyOrder() {
+    const user = await this.request.user;
+    const myOrders = await this.orderService.getMyOrder(user.id);
+    return formatResponse(myOrders, 0, '', []);
   }
 
   @Roles(ROLE.USER)
@@ -56,14 +67,17 @@ export class OrderController {
   @Post()
   async create(@Body() orderDto: any) {
     const user = await this.request.user;
-    const cart = await this.cartService.getById(user.id);
+    const temp = await this.userService.getById(user.id);
+    // get info user from token
+    const cartId = temp.cart.id;
+    const cart = await this.cartService.getById(cartId);
     orderDto = {
       total: cart.total,
       amount: cart.amount,
       user: user.id,
     };
     const order = await this.orderService.create(orderDto);
-    const detailCart = await this.detailCartService.getByIdCart(user.id);
+    const detailCart = await this.detailCartService.getByIdCart(cartId);
 
     const cartFormated = detailCart.map((item) => {
       return {
@@ -73,13 +87,13 @@ export class OrderController {
       };
     });
     const detailOrder = await this.detaiOrderService.create(cartFormated);
-    await this.cartService.reset(user.id);
-    await this.detailCartService.removeMultipleItem(user.id);
+    await this.cartService.reset(cartId);
+    await this.detailCartService.removeMultipleItem(cartId);
     return formatResponse(order, 0, '', []);
   }
 
   @Roles(ROLE.MASTER)
-  @HttpCode(409)
+  @HttpCode(200)
   @Put('updateById/:id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -90,7 +104,7 @@ export class OrderController {
   }
 
   @Roles(ROLE.MASTER)
-  @HttpCode(404)
+  @HttpCode(200)
   @Delete('deleteById/:id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.orderService.remove(id);

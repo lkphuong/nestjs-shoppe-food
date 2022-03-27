@@ -9,8 +9,10 @@ import { JwtAuthGuard } from './common/guards/jwt.auth.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { RolesGuard } from './common/guards/roles.guard';
+import { AppConfigModule } from './config/app/app.module';
 @Module({
   imports: [
+    AppConfigModule,
     TypeOrmModule.forRoot(config),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),

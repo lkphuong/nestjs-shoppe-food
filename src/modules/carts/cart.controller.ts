@@ -17,12 +17,13 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { ROLE } from 'src/common/emuns/role.emun';
 import { formatResponse } from 'src/common/utils/response/response';
 import { REQUEST } from '@nestjs/core';
+import { UserService } from '../users/user.service';
 
 @Controller('cart')
 export class CartController {
   constructor(
     private cartService: CartService,
-    @Inject(REQUEST) private request: any,
+    @Inject(REQUEST) private request: any, // private userService: UserService,
   ) {}
 
   @Roles(ROLE.MASTER)
@@ -34,14 +35,12 @@ export class CartController {
   }
 
   @Roles(ROLE.USER)
-  @Get('getById/:id')
+  @Get('getMyCart')
   @HttpCode(200)
-  async getById(@Param('id', ParseIntPipe) id: number) {
+  async getMyCart() {
     const user = await this.request.user;
-    if (user.id === id || ROLE.MASTER) {
-      return await this.cartService.getById(id);
-    }
-    throw new ForbiddenException();
+    const cart = await this.cartService.getById(user.id);
+    return formatResponse(cart, 0, '', []);
   }
 
   @Roles(ROLE.MASTER)
@@ -53,7 +52,7 @@ export class CartController {
 
   @Roles(ROLE.MASTER)
   @Put('updateById/:id')
-  @HttpCode(409)
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() cartDto: CartDto,
@@ -64,7 +63,7 @@ export class CartController {
 
   @Roles(ROLE.MASTER)
   @Delete('deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(200)
   async delete(@Param('id', ParseIntPipe) id: number) {
     return await this.cartService.remove(id);
   }

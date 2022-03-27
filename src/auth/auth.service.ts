@@ -32,8 +32,8 @@ export class AuthService {
       role: user.group.id,
     };
     const refresh_token = await this.jwtService.sign(payload, {
-      secret: jwtConstants.secret,
-      expiresIn: '3d',
+      secret: process.env.SECRET_KEY,
+      expiresIn: process.env.EXPIRES_IN_REFRESH,
     });
     const tokenDto: TokenDto = {
       refreshToken: refresh_token,

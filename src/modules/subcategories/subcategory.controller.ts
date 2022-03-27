@@ -45,7 +45,7 @@ export class SubcategoryController {
 
   @Roles(ROLE.MASTER)
   @Put('/updateById/:id')
-  @HttpCode(409)
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() categoryDto: CategoryDto,
@@ -57,7 +57,7 @@ export class SubcategoryController {
 
   @Roles(ROLE.MASTER)
   @Delete('deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(200)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.subcategoryService.remove(id);
     return formatResponse({}, 0, '', []);

@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CartEntity } from './entity/cart.entity';
 import { CartDto } from './dto/cart.dto';
+import { UserEntity } from '../users/entity/user.entity';
+import { getRepository } from 'typeorm';
 
 @Injectable()
 export class CartService {
@@ -19,7 +21,13 @@ export class CartService {
   }
 
   async getById(id: number): Promise<CartEntity> {
-    const cart = await this.cartRepository.findOne(id, {
+    const user = await getRepository(UserEntity)
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.cart', 'cart')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    const cartId = user.cart.id;
+    const cart = await this.cartRepository.findOne(cartId, {
       relations: ['detailCarts', 'detailCarts.product'],
     });
     if (cart) {

@@ -5,6 +5,7 @@ import {
   Request,
   UseGuards,
   Headers,
+  HttpCode,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
 import { LocalAuthGuard } from 'src/common/guards/local.auth.guard';
@@ -17,19 +18,20 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Post('/login')
+  @Post('login')
   async login(@Request() req) {
     return await this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/profile')
+  @Get('profile')
   async getProfile(@Request() req) {
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('refreshToken')
+  @HttpCode(205)
   async refreshToken(@Headers() headers) {
     const token: string = headers.authorization.replace('Bearer ', '');
     return this.authService.refreshToken(token);

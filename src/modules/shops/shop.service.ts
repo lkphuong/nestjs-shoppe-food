@@ -14,13 +14,15 @@ export class ShopService {
   async getAll(): Promise<ShopEntity[]> {
     const shops = await this.shopRepository.find({
       take: 20,
-      relations: ['menus', 'products'],
+      relations: ['menus', 'menus.products'],
     });
     return shops;
   }
 
   async getbyId(id: number): Promise<ShopEntity> {
-    const shop = await this.shopRepository.findOne(id);
+    const shop = await this.shopRepository.findOne(id, {
+      relations: ['menus', 'menus.products'],
+    });
     if (shop) {
       return shop;
     }

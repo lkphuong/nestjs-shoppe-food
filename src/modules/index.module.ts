@@ -10,8 +10,10 @@ import { SubcategoryModule } from './subcategories/subcategory.module';
 import { CartModule } from './carts/cart.module';
 import { DetailCartModule } from './detailCarts/detailCart.module';
 import { OrderModule } from './orders/order.module';
+import { AppConfigModule } from 'src/config/app/app.module';
 @Module({
   imports: [
+    AppConfigModule,
     UserModule,
     AuthModule,
     ProductModule,

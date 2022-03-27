@@ -8,7 +8,7 @@ import { DetailCartDto } from './dto/detailCart.dto';
 export class DetailCartController {
   constructor(private detailCartService: DetailCartService) {}
 
-  @Roles(ROLE.MASTER)
+  @Roles(ROLE.USER)
   @Post()
   @HttpCode(201)
   async create(@Body() detailCartDto: DetailCartDto) {
@@ -17,7 +17,7 @@ export class DetailCartController {
 
   @Roles(ROLE.MASTER)
   @Delete('deleteByDetailCart')
-  @HttpCode(404)
+  @HttpCode(200)
   async detele(@Body() detailCartDto: DetailCartDto) {
     await this.detailCartService.remove(detailCartDto);
     return formatResponse({}, 0, 'Delete item success', []);

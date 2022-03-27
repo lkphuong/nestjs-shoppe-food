@@ -64,7 +64,7 @@ export class ProductController {
 
   @Roles(ROLE.ADMIN)
   @Put('/updateById/:id')
-  @HttpCode(409)
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() productDto: ProductDto,
@@ -76,7 +76,7 @@ export class ProductController {
 
   @Roles(ROLE.ADMIN)
   @Delete('/deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(200)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.productService.remove(id);
     return formatResponse({}, 0, '', []);

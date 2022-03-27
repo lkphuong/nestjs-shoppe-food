@@ -29,7 +29,7 @@ export class MenuController {
   }
 
   @Public()
-  @Get('/getById/:id')
+  @Get('getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
     const data = await this.menuService.getById(id);
@@ -45,8 +45,8 @@ export class MenuController {
   }
 
   @Roles(ROLE.ADMIN)
-  @Put('/updateById/:id')
-  @HttpCode(409)
+  @Put('updateById/:id')
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() menuDto: MenuDto,
@@ -57,8 +57,8 @@ export class MenuController {
   }
 
   @Roles(ROLE.ADMIN)
-  @Delete('/deleteById/:id')
-  @HttpCode(404)
+  @Delete('deleteById/:id')
+  @HttpCode(200)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.menuService.remove(id);
     return formatResponse({}, 0, 'delete success', []);

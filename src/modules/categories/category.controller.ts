@@ -28,7 +28,7 @@ export class CategoryController {
   }
 
   @Public()
-  @Get('/getById/:id')
+  @Get('getById/:id')
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
     const category = await this.categoryService.getById(id);
@@ -44,8 +44,8 @@ export class CategoryController {
   }
 
   @Roles(ROLE.ADMIN)
-  @Put('/updateById/:id')
-  @HttpCode(409)
+  @Put('updateById/:id')
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() categoryDto: CategoryDto,
@@ -57,7 +57,7 @@ export class CategoryController {
 
   @Roles(ROLE.ADMIN)
   @Delete('deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(200)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.categoryService.remove(id);
     return formatResponse({}, 0, '', []);

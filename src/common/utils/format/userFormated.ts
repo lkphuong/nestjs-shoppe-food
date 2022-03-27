@@ -5,6 +5,7 @@ export function formatUser(users: any) {
     return {
       ...user,
       group: user.group.id,
+      cart: user.cart.id,
     };
   });
   return userFormated;

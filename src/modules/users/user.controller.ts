@@ -10,6 +10,7 @@ import {
   Body,
   Inject,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { formatResponse } from 'src/common/utils/response/response';
@@ -32,7 +33,6 @@ export class UserController {
   @Get()
   @HttpCode(200)
   async getAll() {
-    console.log(await this.request.user);
     const data = await this.userService.getAll();
     return formatResponse(data, 0, 'success', []);
   }
@@ -42,7 +42,7 @@ export class UserController {
   @HttpCode(200)
   async getById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.request.user;
-    if (user.id === id || ROLE.MASTER) {
+    if (user.id === id || user.role === ROLE.MASTER) {
       const data = await this.userService.getById(id);
       return formatResponse(data, 0, 'success', []);
     }
@@ -54,7 +54,7 @@ export class UserController {
   @HttpCode(200)
   async getByUsername(@Param('username') username: string) {
     const user = await this.request.user;
-    if (user.username == username || ROLE.MASTER) {
+    if (user.username === username || user.role === ROLE.MASTER) {
       const data = await this.userService.getByUsername(username);
       return formatResponse(data, 0, 'success', []);
     }
@@ -69,22 +69,34 @@ export class UserController {
       total: 0,
       amount: 0,
     };
-    const cart = await this.cartService.create(cartDto);
-    userDto.cart = cart.id;
-    userDto.group = 1;
-    const data = await this.userService.create(userDto);
-    return formatResponse(data, 0, 'success', []);
+    await this.cartService
+      .create(cartDto)
+      .then(async (cart) => {
+        userDto.cart = cart.id;
+        userDto.group = 1;
+        await this.userService
+          .create(userDto)
+          .then((user) => {
+            return formatResponse(user, 0, 'success', []);
+          })
+          .catch(() => {
+            throw new BadRequestException();
+          });
+      })
+      .catch(() => {
+        throw new BadRequestException();
+      });
   }
 
   @Roles(ROLE.USER)
   @Put('/updateById/:id')
-  @HttpCode(409)
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() userDto: UserDto,
   ) {
     const user = await this.request.user;
-    if (user.id === id || ROLE.MASTER) {
+    if (user.id === id || user.role === ROLE.MASTER) {
       await this.userService.update(id, userDto);
       return formatResponse(userDto, 0, '', []);
     }
@@ -93,7 +105,7 @@ export class UserController {
 
   @Roles(ROLE.MASTER)
   @Delete('/deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(200)
   async delete(@Param('id') id: number) {
     await this.userService.remove(id);
     return formatResponse([], 0, 'delete success', []);

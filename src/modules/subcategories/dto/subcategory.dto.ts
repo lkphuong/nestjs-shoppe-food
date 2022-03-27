@@ -3,5 +3,5 @@ export class SubcategoryDto {
   @IsNotEmpty()
   @IsString()
   name: string;
-  description?: string;
+  description: string;
 }

@@ -46,7 +46,7 @@ export class ShopController {
 
   @Roles(ROLE.ADMIN)
   @Put('/updateById/:id')
-  @HttpCode(409)
+  @HttpCode(200)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() shopDto: ShopDto,
@@ -58,7 +58,7 @@ export class ShopController {
 
   @Roles(ROLE.ADMIN)
   @Delete('/deleteById/:id')
-  @HttpCode(404)
+  @HttpCode(400)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.shopService.remove(id);
     return formatResponse({}, 0, '', []);
