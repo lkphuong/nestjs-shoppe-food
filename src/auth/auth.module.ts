@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { UserModule } from 'src/modules/users/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/common/constants/constants';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.stategy';
 import { AuthController } from './auth.controller';
+import { AppConfigModule } from 'src/config/app/app.module';
 @Module({
   imports: [
+    AppConfigModule,
     UserModule,
     PassportModule.register({ session: true }),
     JwtModule.register({

@@ -1,8 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { config } from './config/database/config';
 import { IndexModule } from './modules/index.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt.auth.guard';
@@ -13,7 +10,16 @@ import { AppConfigModule } from './config/app/app.module';
 @Module({
   imports: [
     AppConfigModule,
-    TypeOrmModule.forRoot(config),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.NAME,
+      password: `${process.env.PASSWORD}`,
+      database: process.env.DATABASE,
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
