@@ -58,6 +58,7 @@ export class ProductController {
   ) {
     console.log(image);
     productDto.image = image.path.slice(7);
+    console.log(productDto);
     const data = await this.productService.create(productDto);
     return formatResponse(data, 0, '', []);
   }

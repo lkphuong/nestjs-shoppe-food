@@ -43,6 +43,14 @@ export class AuthService {
     };
   }
 
+  async logout(id: number) {
+    const user = await this.userService.removeRefreshToken(id);
+    if (user.affected === 1) {
+      return user;
+    }
+    throw new BadRequestException();
+  }
+
   async refreshToken(token: string) {
     const user = await this.userService.findByRefreshToken(token);
     const payload = {

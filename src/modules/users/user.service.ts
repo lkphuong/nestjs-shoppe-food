@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
@@ -84,6 +84,21 @@ export class UserService {
     );
     if (user) {
       return user;
+    }
+    throw new NotFoundException();
+  }
+
+  async removeRefreshToken(id: number) {
+    const user = await this.userRepository.findOne(id);
+    if (user) {
+      return await getRepository(UserEntity)
+        .createQueryBuilder('user')
+        .update(UserEntity)
+        .set({
+          refreshToken: '',
+        })
+        .where('id = :id', { id: id })
+        .execute();
     }
     throw new NotFoundException();
   }
