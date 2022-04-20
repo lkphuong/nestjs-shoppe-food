@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { ShopEntity } from './entity/shop.entity';
 import { ShopDto } from './dto/shop.dto';
+import { readFileExcel } from 'src/common/utils/excel/readFileExcel';
+import { convertJsonToExcel } from 'src/common/utils/excel/convertJsonToExcel';
 
 @Injectable()
 export class ShopService {
@@ -47,5 +49,23 @@ export class ShopService {
       return await this.shopRepository.delete(id);
     }
     throw new NotFoundException();
+  }
+
+  async exportExcel() {
+    const products = await this.shopRepository.find();
+    convertJsonToExcel(products);
+    return 'success';
+  }
+
+  async importExcel(pathFile: string) {
+    const data = readFileExcel(pathFile);
+    console.log(data);
+    await getConnection()
+      .createQueryBuilder()
+      .insert()
+      .into('shop_entity')
+      .values(data)
+      .execute();
+    return 'Import success';
   }
 }

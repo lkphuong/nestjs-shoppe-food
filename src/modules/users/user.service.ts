@@ -29,6 +29,8 @@ export class UserService {
       relations: ['group', 'cart'],
     });
     if (user) {
+      delete user.password;
+      delete user.refreshToken;
       return user;
     }
     throw new NotFoundException();

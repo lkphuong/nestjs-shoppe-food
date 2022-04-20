@@ -13,13 +13,19 @@ export class OrderService {
   ) {}
 
   async getAll(): Promise<OrderEntity[]> {
-    return await this.orderRepository.find({ take: 10 });
+    return await this.orderRepository.find({
+      take: 10,
+      relations: ['detailOrders', 'detailOrders.product'],
+    });
   }
 
   async getById(id: number): Promise<OrderEntity> {
-    return await this.orderRepository.findOne(id, {
+    const order = await this.orderRepository.findOne(id, {
       relations: ['user', 'detailOrders', 'detailOrders.product'],
     });
+    delete order.user.password;
+    delete order.user.refreshToken;
+    return order;
   }
 
   async getMyOrder(userId: number) {

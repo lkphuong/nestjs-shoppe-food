@@ -8,8 +8,10 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  StreamableFile,
   UploadedFile,
   UseInterceptors,
+  Response,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductDto } from './dto/product.dto';
@@ -19,6 +21,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { ROLE } from 'src/common/emuns/role.emun';
 import { Public } from 'src/auth/setMetadata';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 
 @Controller('product')
 export class ProductController {
@@ -81,5 +85,20 @@ export class ProductController {
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.productService.remove(id);
     return formatResponse({}, 0, '', []);
+  }
+
+  // @Roles(ROLE.MASTER)
+  @Public()
+  @HttpCode(200)
+  @Get('/export')
+  async getFile(@Response({ passthrough: true }) res): Promise<StreamableFile> {
+    const fileExcel = await this.productService.exportExcel();
+    // console.log(fileExcel);
+    const file = createReadStream(join(process.cwd(), 'download.xlsx'));
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': 'attachment; filename="download.xlsx"',
+    });
+    return new StreamableFile(file);
   }
 }

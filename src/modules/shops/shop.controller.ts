@@ -8,11 +8,19 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
+  UseInterceptors,
+  Response,
+  StreamableFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 import { Public } from 'src/auth/setMetadata';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { ROLE } from 'src/common/emuns/role.emun';
 import { formatResponse } from 'src/common/utils/response/response';
+import { storage } from 'src/config/storage/storage';
 import { ShopDto } from './dto/shop.dto';
 import { ShopService } from './shop.service';
 
@@ -62,5 +70,26 @@ export class ShopController {
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.shopService.remove(id);
     return formatResponse({}, 0, '', []);
+  }
+
+  @Public()
+  @HttpCode(200)
+  @Get('/export')
+  async getFile(@Response({ passthrough: true }) res): Promise<StreamableFile> {
+    const fileExcel = await this.shopService.exportExcel();
+    // console.log(fileExcel);
+    const file = createReadStream(join(process.cwd(), 'download.xlsx'));
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': 'attachment; filename="download.xlsx"',
+    });
+    return new StreamableFile(file);
+  }
+
+  @Public()
+  @Post('/import')
+  @UseInterceptors(FileInterceptor('file', storage))
+  async importExcel(@UploadedFile() file: Express.Multer.File) {
+    return await this.shopService.importExcel(file.path);
   }
 }

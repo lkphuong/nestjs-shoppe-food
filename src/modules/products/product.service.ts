@@ -4,7 +4,7 @@ import { ChangeToSlug } from 'src/common/utils/changeToSlug/changeToSlug';
 import { Repository } from 'typeorm';
 import { ProductDto } from './dto/product.dto';
 import { ProductEntity } from './entity/product.entity';
-
+import { convertJsonToExcel } from 'src/common/utils/excel/convertJsonToExcel';
 @Injectable()
 export class ProductService {
   constructor(
@@ -57,5 +57,28 @@ export class ProductService {
       return await this.productRepository.delete(id);
     }
     throw new NotFoundException();
+  }
+
+  //import product
+
+  //export product
+  async exportExcel() {
+    const products = await this.productRepository.find({
+      relations: ['menu', 'shop', 'category'],
+    });
+
+    const productsFormated = products.map((product) => {
+      delete product.slug;
+      delete product.image;
+      delete product.category;
+      return {
+        ...product,
+        menu: product.menu.name,
+        shop: product.shop.name,
+        address: product.shop.address,
+      };
+    });
+    convertJsonToExcel(productsFormated);
+    return 'success';
   }
 }
